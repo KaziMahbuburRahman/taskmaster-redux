@@ -1,20 +1,20 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
-export default function Modal() {
-  let [isOpen, setIsOpen] = useState(true)
+export default function Modal({ isOpen, setIsOpen }) {
+  // let [isOpen, setIsOpen] = useState(true)
 
   function closeModal() {
-    setIsOpen(false)
+    setIsOpen(false);
   }
 
-  function openModal() {
-    setIsOpen(true)
-  }
+  // function openModal() {
+  //   setIsOpen(true)
+  // }
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center">
+      {/* <div className="fixed inset-0 flex items-center justify-center">
         <button
           type="button"
           onClick={openModal}
@@ -22,7 +22,7 @@ export default function Modal() {
         >
           Open dialog
         </button>
-      </div>
+      </div> */}
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -79,5 +79,5 @@ export default function Modal() {
         </Dialog>
       </Transition>
     </>
-  )
+  );
 }
