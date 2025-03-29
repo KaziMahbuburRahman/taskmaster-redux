@@ -2,11 +2,15 @@ import {
   CheckIcon,
   DocumentMagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { useDispatch } from "react-redux";
+import { updateStatus } from "../../redux/features/tasks/tasksSlice";
+import Modal from "../ui/Modal";
+import { useState } from "react";
 
 const MyTasks = ({ tasks }) => {
-  const filteredTasks = tasks.filter(
-    (task) => task.assignTo === "Mir Hussain"
-  );
+  const dispatch = useDispatch();
+  const [isOpen, setIsOpen] = useState(false);
+  const filteredTasks = tasks.filter((task) => task.assignTo === "Mir Hussain");
   console.log(filteredTasks);
 
   return (
@@ -20,10 +24,25 @@ const MyTasks = ({ tasks }) => {
           >
             <h1>{task.title}</h1>
             <div className="flex gap-3">
-              <button className="grid place-content-center" title="Details">
+              <button onClick={()=>setIsOpen(true)} className="grid place-content-center" title="Details">
+                <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Task Details">
+                  <div>
+                    <h1>{task.title}</h1>
+                    <p>{task.description}</p>
+                    <p>{task.status}</p>
+                    <p>{task.assignTo}</p>
+                    <p>{task.createdAt}</p>
+                  </div>
+                </Modal>
                 <DocumentMagnifyingGlassIcon className="w-5 h-5 text-primary" />
               </button>
-              <button className="grid place-content-center" title="Done">
+              <button
+                onClick={() => {
+                  dispatch(updateStatus({ id: task.id, status: "completed" }));
+                }}
+                className="grid place-content-center"
+                title="Done"
+              >
                 <CheckIcon className="w-5 h-5 text-primary" />
               </button>
             </div>
