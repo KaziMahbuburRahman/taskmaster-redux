@@ -50,11 +50,17 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Assign To</label>
-          <input
-            type="text"
+          <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             {...register("assignTo", { required: "Assignee is required" })}
-          />
+          >
+            <option value="">Select assignee</option>
+            <option value="Mir Hussain">Mir Hussain</option>
+            <option value="Mezba Abedin">Mezba Abedin</option>
+            <option value="Rahatul Islam">Rahatul Islam</option>
+            <option value="Tanmoy Parvez">Tanmoy Parvez</option>
+            <option value="Fahim Ahmed">Fahim Ahmed</option>
+          </select>
           {errors.assignTo && <span className="text-red-500 text-sm">{errors.assignTo.message}</span>}
         </div>
 
