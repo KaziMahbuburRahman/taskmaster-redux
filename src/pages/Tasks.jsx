@@ -122,7 +122,7 @@ const Tasks = () => {
             </div>
           </div>
         </div>
-        <MyTasks />
+        <MyTasks tasks={tasks} />
       </div>
     </div>
   );
