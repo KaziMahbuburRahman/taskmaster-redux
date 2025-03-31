@@ -1,83 +1,58 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import auth from "../../../utils/firebase.config";
 
 const initialState = {
-  users: [
-    {
-      id: 1,
-      name: "Mir Hussain",
-      email: "mirhussain@gmail.com",
-      password: "123456",
-      avatar:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-      role: "admin",
-    },
-    {
-      id: 2,
-      name: "Mezba Abedin",
-      email: "mezba@gmail.com",
-      password: "123456",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-      role: "user",
-    },
-    {
-      id: 3,
-      name: "Rahatul Islam",
-      email: "rahat@gmail.com",
-      password: "123456",
-      avatar:
-        "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-      role: "user",
-    },
-  ],
-  currentUser: JSON.parse(localStorage.getItem("currentUser")) || null,
-  isAuthenticated: localStorage.getItem("isAuthenticated") === "true",
+  name: "",
+  email: "",
+  isLoading: false,
+  isError: false,
+  error: "",
 };
+
+export const createUser = createAsyncThunk(
+  "userSlice/createUser",
+  async ({ name, email, password }) => {
+    const data = await createUserWithEmailAndPassword(auth, email, password);
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    });
+    console.log(data);
+    return data;
+  }
+);
 
 const userSlice = createSlice({
   name: "userSlice",
   initialState,
-  reducers: {
-    login: (state, action) => {
-      const { email, password } = action.payload;
-      const user = state.users.find(
-        (u) => u.email === email && u.password === password
-      );
-      if (user) {
-        state.currentUser = user;
-        state.isAuthenticated = true;
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        localStorage.setItem("isAuthenticated", "true");
-      }
-    },
-    logout: (state) => {
-      state.currentUser = null;
-      state.isAuthenticated = false;
-      localStorage.removeItem("currentUser");
-      localStorage.removeItem("isAuthenticated");
-    },
-    addUser: (state, action) => {
-      const newUser = {
-        id: state.users.length + 1,
-        ...action.payload,
-        role: "user",
-      };
-      state.users.push(newUser);
-    },
-    updateUser: (state, action) => {
-      const { id, ...updates } = action.payload;
-      const user = state.users.find((u) => u.id === id);
-      if (user) {
-        Object.assign(user, updates);
-      }
-    },
-    deleteUser: (state, action) => {
-      state.users = state.users.filter((user) => user.id !== action.payload);
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    // Add reducers for additional action types here, and handle loading state as needed
+    builder.addCase(createUser.pending, (state) => {
+      // Add user to the state array
+      state.isLoading = true;
+      state.isError = false;
+      state.email = "";
+      state.name = "";
+      state.error = "";
+    }),
+      builder.addCase(createUser.fulfilled, (state, { payload }) => {
+        // Add user to the state array
+        state.isLoading = false;
+        state.isError = false;
+        state.email = payload.email;
+        state.name = payload.name;
+        state.error = "";
+      }),
+      builder.addCase(createUser.rejected, (state, action) => {
+        // Add user to the state array
+        state.isLoading = true;
+        state.isError = true;
+        state.email = "";
+        state.name = "";
+        state.error = action.error.message;
+      });
   },
 });
-
-export const { login, logout, addUser, updateUser, deleteUser } =
-  userSlice.actions;
 
 export default userSlice.reducer;
