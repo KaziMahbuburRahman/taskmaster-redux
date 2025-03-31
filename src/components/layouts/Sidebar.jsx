@@ -8,15 +8,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/image/logo.png";
-import { logout } from "../../redux/features/tasks/userSlice";
+// import { logout } from "../../redux/features/tasks/userSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.users);
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  // const handleLogout = () => {
+  //   dispatch(logout());
+  // };
 
   return (
     <div className="h-screen sticky top-0 border-r-2 border-secondary/20">
@@ -64,7 +64,7 @@ const Sidebar = () => {
             </div>
           )}
           <button
-            onClick={handleLogout}
+            // onClick={handleLogout}
             className="p-2 rounded-2xl group hover:bg-red-500 text-secondary/40 hover:text-white cursor-pointer transition-all"
             title="Logout"
           >
