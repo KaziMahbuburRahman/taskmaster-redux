@@ -1,35 +1,29 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 import Tasks from '../pages/Tasks';
 import Chat from '../pages/Chat';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
+import Archive from '../pages/Archive';
 import Login from '../pages/Login';
-
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
-
+import Signup from '../pages/Signup';
+import PrivateRoute from '../components/layouts/PrivateRoute';
 const routes = createBrowserRouter([
-  {
-    path: '/login',
-    element: <Login />,
-  },
   {
     path: '/',
     element: (
-      <ProtectedRoute>
+      <PrivateRoute>
         <App />
-      </ProtectedRoute>
+      </PrivateRoute>
     ),
     children: [
       {
         index: true,
         element: <Tasks />,
+      },
+      {
+        path: '/archive',
+        element: <Archive />,
       },
       {
         path: '/chat',
@@ -44,6 +38,14 @@ const routes = createBrowserRouter([
         element: <Profile />,
       },
     ],
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/signup',
+    element: <Signup />,
   },
 ]);
 
