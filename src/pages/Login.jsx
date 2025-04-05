@@ -1,14 +1,17 @@
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
+import { signInUser } from "../redux/features/tasks/userSlice";
 const Login = () => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const onSubmit = ({ email, password }) => {
     // Email Password Login
 
-    console.log(email, password);
+    dispatch(signInUser({ email, password }));
+    navigate("/");
   };
 
   // const handleGoogleLogin = () => {
