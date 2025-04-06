@@ -1,7 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { tasksApi } from "../features/tasks/tasksApiSlice";
+
 import tasksSlice from "./features/tasks/tasksSlice";
 import userSlice from "./features/tasks/userSlice";
+import { tasksApi } from "./features/api/tasksApiSlice";
 const store = configureStore({
   reducer: {
     [tasksApi.reducerPath]: tasksApi.reducer,
