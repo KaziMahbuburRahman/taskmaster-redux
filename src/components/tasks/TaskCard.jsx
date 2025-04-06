@@ -1,12 +1,23 @@
 import { ArrowRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
-import {
-  removeTask,
-  updateStatus,
-} from "../../redux/features/tasks/tasksSlice";
+import { useUpdateTaskStatusMutation } from "../../redux/features/api/tasksApiSlice";
+import { removeTask } from "../../redux/features/tasks/tasksSlice";
 
 const TaskCard = ({ task }) => {
   const dispatch = useDispatch();
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
+
+  const handleStatusUpdate = async () => {
+    try {
+      if (task.status === "pending") {
+        await updateTaskStatus({ id: task.id, status: "in-progress" }).unwrap();
+      } else if (task.status === "in-progress") {
+        await updateTaskStatus({ id: task.id, status: "completed" }).unwrap();
+      }
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
 
   return (
     <div className="bg-secondary/10 rounded-md p-5">
@@ -27,16 +38,7 @@ const TaskCard = ({ task }) => {
           <button onClick={() => dispatch(removeTask(task.id))} title="Delete">
             <TrashIcon className="h-5 w-5 text-red-500" />
           </button>
-          <button
-            onClick={() => {
-              if (task.status === "pending") {
-                dispatch(updateStatus({ id: task.id, status: "in-progress" }));
-              } else if (task.status === "in-progress") {
-                dispatch(updateStatus({ id: task.id, status: "completed" }));
-              }
-            }}
-            title="In progress"
-          >
+          <button onClick={handleStatusUpdate} title="In progress">
             <ArrowRightIcon className="h-5 w-5 text-primary" />
           </button>
         </div>
