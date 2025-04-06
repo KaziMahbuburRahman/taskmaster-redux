@@ -1,20 +1,22 @@
-import { createBrowserRouter } from 'react-router-dom';
-import App from '../App';
-import Tasks from '../pages/Tasks';
-import Chat from '../pages/Chat';
-import Settings from '../pages/Settings';
-import Profile from '../pages/Profile';
-import Archive from '../pages/Archive';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
-import PrivateRoute from '../components/layouts/PrivateRoute';
+import { createBrowserRouter } from "react-router-dom";
+import App from "../App";
+import PrivateRoute from "../components/layouts/PrivateRoute";
+import Archive from "../pages/Archive";
+import Chat from "../pages/Chat";
+import Login from "../pages/Login";
+import Profile from "../pages/Profile";
+import Settings from "../pages/Settings";
+import Signup from "../pages/Signup";
+import Tasks from "../pages/Tasks";
 const routes = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: (
-      <PrivateRoute>
-        <App />
-      </PrivateRoute>
+      <>
+        <PrivateRoute>
+          <App />
+        </PrivateRoute>
+      </>
     ),
     children: [
       {
@@ -22,29 +24,29 @@ const routes = createBrowserRouter([
         element: <Tasks />,
       },
       {
-        path: '/archive',
+        path: "/archive",
         element: <Archive />,
       },
       {
-        path: '/chat',
+        path: "/chat",
         element: <Chat />,
       },
       {
-        path: '/settings',
+        path: "/settings",
         element: <Settings />,
       },
       {
-        path: '/profile',
+        path: "/profile",
         element: <Profile />,
       },
     ],
   },
   {
-    path: '/login',
+    path: "/login",
     element: <Login />,
   },
   {
-    path: '/signup',
+    path: "/signup",
     element: <Signup />,
   },
 ]);
