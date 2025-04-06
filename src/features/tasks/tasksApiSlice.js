@@ -7,7 +7,14 @@ export const tasksApi = createApi({
     getTasks: builder.query({
       query: () => "/tasks",
     }),
+    createTask: builder.mutation({
+      query: (task) => ({
+        url: "/tasks",
+        method: "POST",
+        body: task,
+      }),
+    }),
   }),
 });
 
-export const { useGetTasksQuery } = tasksApi;
+export const { useGetTasksQuery, useCreateTaskMutation } = tasksApi;
