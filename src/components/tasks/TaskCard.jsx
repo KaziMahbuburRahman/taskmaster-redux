@@ -9,13 +9,35 @@ const TaskCard = ({ task }) => {
 
   const handleStatusUpdate = async () => {
     try {
+      console.log("Full task object:", task);
+      console.log("Current task status:", task.status);
+      console.log("Task ID:", task._id || task.id); // Check both possible ID fields
+
+      if (!task._id && !task.id) {
+        console.error("No task ID found in task object");
+        return;
+      }
+
+      const taskId = task._id || task.id;
+
       if (task.status === "pending") {
-        await updateTaskStatus({ id: task.id, status: "in-progress" }).unwrap();
+        console.log("Updating to in-progress");
+        const result = await updateTaskStatus({
+          id: taskId,
+          status: "in-progress",
+        }).unwrap();
+        console.log("Update result:", result);
       } else if (task.status === "in-progress") {
-        await updateTaskStatus({ id: task.id, status: "completed" }).unwrap();
+        console.log("Updating to completed");
+        const result = await updateTaskStatus({
+          id: taskId,
+          status: "completed",
+        }).unwrap();
+        console.log("Update result:", result);
       }
     } catch (error) {
       console.error("Failed to update task status:", error);
+      console.error("Error details:", error.data);
     }
   };
 
@@ -35,7 +57,10 @@ const TaskCard = ({ task }) => {
       <div className="flex justify-between mt-3">
         <p>{task?.deadline}</p>
         <div className="flex gap-3">
-          <button onClick={() => dispatch(removeTask(task.id))} title="Delete">
+          <button
+            onClick={() => dispatch(removeTask(task._id || task.id))}
+            title="Delete"
+          >
             <TrashIcon className="h-5 w-5 text-red-500" />
           </button>
           <button onClick={handleStatusUpdate} title="In progress">
