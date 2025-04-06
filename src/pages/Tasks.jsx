@@ -11,8 +11,8 @@ const Tasks = () => {
   const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
 
   const pendingTasks = tasks?.filter((item) => item.status === "pending");
-  const runningTasks = tasks?.filter((item) => item.status === "running");
-  const doneTasks = tasks?.filter((item) => item.status === "done");
+  const runningTasks = tasks?.filter((item) => item.status === "in-progress");
+  const doneTasks = tasks?.filter((item) => item.status === "completed");
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading tasks</div>;
