@@ -1,55 +1,81 @@
-import React from "react";
 import { useForm } from "react-hook-form";
+import { useCreateTaskMutation } from "../../features/tasks/tasksApiSlice";
 import Modal from "../ui/Modal";
-import { useDispatch } from "react-redux";
-import { addTask } from "../../redux/features/tasks/tasksSlice";
 
 const AddTaskModal = ({ isOpen, setIsOpen }) => {
-  const dispatch = useDispatch();
+  const [createTask] = useCreateTaskMutation();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
-  const onSubmit = (data) => {
-    dispatch(addTask(data));
 
+  const onSubmit = async (data) => {
+    try {
+      await createTask(data).unwrap();
+      setIsOpen(false);
+      reset();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
   };
+
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Add Task">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Title</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Title
+          </label>
           <input
             type="text"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             {...register("title", { required: "Title is required" })}
           />
-          {errors.title && <span className="text-red-500 text-sm">{errors.title.message}</span>}
+          {errors.title && (
+            <span className="text-red-500 text-sm">{errors.title.message}</span>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Description</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
           <textarea
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             rows={3}
-            {...register("description", { required: "Description is required" })}
+            {...register("description", {
+              required: "Description is required",
+            })}
           />
-          {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
+          {errors.description && (
+            <span className="text-red-500 text-sm">
+              {errors.description.message}
+            </span>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Deadline</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Deadline
+          </label>
           <input
             type="date"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             {...register("deadline", { required: "Deadline is required" })}
           />
-          {errors.deadline && <span className="text-red-500 text-sm">{errors.deadline.message}</span>}
+          {errors.deadline && (
+            <span className="text-red-500 text-sm">
+              {errors.deadline.message}
+            </span>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Assign To</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Assign To
+          </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             {...register("assignTo", { required: "Assignee is required" })}
@@ -61,11 +87,17 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
             <option value="Tanmoy Parvez">Tanmoy Parvez</option>
             <option value="Fahim Ahmed">Fahim Ahmed</option>
           </select>
-          {errors.assignTo && <span className="text-red-500 text-sm">{errors.assignTo.message}</span>}
+          {errors.assignTo && (
+            <span className="text-red-500 text-sm">
+              {errors.assignTo.message}
+            </span>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Priority</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Priority
+          </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             {...register("priority", { required: "Priority is required" })}
@@ -75,7 +107,11 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
-          {errors.priority && <span className="text-red-500 text-sm">{errors.priority.message}</span>}
+          {errors.priority && (
+            <span className="text-red-500 text-sm">
+              {errors.priority.message}
+            </span>
+          )}
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
