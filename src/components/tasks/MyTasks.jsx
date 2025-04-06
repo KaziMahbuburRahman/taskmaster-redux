@@ -2,10 +2,10 @@ import {
   CheckIcon,
   DocumentMagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateStatus } from "../../redux/features/tasks/tasksSlice";
 import Modal from "../ui/Modal";
-import { useState } from "react";
 
 const MyTasks = ({ tasks }) => {
   const dispatch = useDispatch();
@@ -24,8 +24,16 @@ const MyTasks = ({ tasks }) => {
           >
             <h1>{task.title}</h1>
             <div className="flex gap-3">
-              <button onClick={()=>setIsOpen(true)} className="grid place-content-center" title="Details">
-                <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Task Details">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="grid place-content-center"
+                title="Details"
+              >
+                <Modal
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  title="Task Details"
+                >
                   <div>
                     <h1>{task.title}</h1>
                     <p>{task.description}</p>
