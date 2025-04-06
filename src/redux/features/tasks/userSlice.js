@@ -47,6 +47,8 @@ const userSlice = createSlice({
       state.name = action.payload.displayName;
       state.email = action.payload.email;
       state.isLoading = false;
+      state.isError = false;
+      state.error = "";
     },
     toggleLoading: (state, { payload }) => {
       state.isLoading = payload;
@@ -55,6 +57,8 @@ const userSlice = createSlice({
       state.name = "";
       state.email = "";
       state.isLoading = false;
+      state.isError = false;
+      state.error = "";
     },
   },
   extraReducers: (builder) => {
