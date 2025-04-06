@@ -3,15 +3,21 @@ import {
   DocumentMagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { updateStatus } from "../../redux/features/tasks/tasksSlice";
+import { useUpdateTaskStatusMutation } from "../../redux/features/api/tasksApiSlice";
 import Modal from "../ui/Modal";
 
 const MyTasks = ({ tasks }) => {
-  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const filteredTasks = tasks.filter((task) => task.assignTo === "Mir Hussain");
-  console.log(filteredTasks);
+
+  const handleCompleteTask = async (taskId) => {
+    try {
+      await updateTaskStatus({ id: taskId, status: "completed" }).unwrap();
+    } catch (error) {
+      console.error("Failed to complete task:", error);
+    }
+  };
 
   return (
     <div>
@@ -45,9 +51,7 @@ const MyTasks = ({ tasks }) => {
                 <DocumentMagnifyingGlassIcon className="w-5 h-5 text-primary" />
               </button>
               <button
-                onClick={() => {
-                  dispatch(updateStatus({ id: task.id, status: "completed" }));
-                }}
+                onClick={() => handleCompleteTask(task.id)}
                 className="grid place-content-center"
                 title="Done"
               >
