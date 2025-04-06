@@ -1,8 +1,10 @@
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
 import { signInUser } from "../redux/features/tasks/userSlice";
+import auth from "../utils/firebase.config";
 const Login = () => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
@@ -14,10 +16,11 @@ const Login = () => {
     navigate("/");
   };
 
-  // const handleGoogleLogin = () => {
-  //   //  Google Login
-  //   console.log("google login");
-  // };
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    navigate("/");
+  };
 
   return (
     <div className="flex max-w-7xl h-screen items-center mx-auto">
@@ -65,7 +68,7 @@ const Login = () => {
             <button
               type="button"
               className="btn btn-primary w-full"
-              // onClick={handleGoogleLogin}
+              onClick={handleGoogleLogin}
             >
               Login with Google
             </button>
