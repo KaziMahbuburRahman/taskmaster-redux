@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
 import { createUser } from "../redux/features/tasks/userSlice";
@@ -12,6 +13,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [disabled, setDisabled] = useState(true);
   const dispatch = useDispatch();
+  const { error, isError } = useSelector((state) => state.users);
   useEffect(() => {
     if (
       password !== undefined &&
@@ -32,6 +34,11 @@ const Signup = () => {
     dispatch(createUser({ name, email, password }));
   };
 
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(error);
+    }
+  }, [isError, error]);
   // const handleGoogleLogin = () => {
   //   // Google Login
   //   console.log("google login");
