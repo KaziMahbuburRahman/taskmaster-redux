@@ -3,10 +3,12 @@ import {
   useDeleteTaskMutation,
   useUpdateTaskStatusMutation,
 } from "../../redux/features/api/tasksApiSlice";
+import { useGetUserImageQuery } from "../../redux/features/api/userImagesApi";
 
 const TaskCard = ({ task }) => {
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const [deleteTask] = useDeleteTaskMutation();
+  const { data: assigneeImage } = useGetUserImageQuery(task?.assigneePhotoURL);
 
   const getTaskId = () => {
     return task._id || task.id;
@@ -65,9 +67,16 @@ const TaskCard = ({ task }) => {
           {task?.description}
         </p>
         <div className="flex flex-col gap-2">
-          <p className="text-xs md:text-sm text-gray-600">
-            Assigned to - {task?.assignTo}
-          </p>
+          <div className="flex items-center gap-2">
+            <img
+              src={assigneeImage}
+              alt={task?.assignTo}
+              className="w-6 h-6 rounded-full object-cover"
+            />
+            <p className="text-xs md:text-sm text-gray-600">
+              Assigned to - {task?.assignTo}
+            </p>
+          </div>
           <div className="flex items-center justify-between">
             <p className="text-xs md:text-sm text-gray-600">{task?.deadline}</p>
             <div className="flex items-center gap-3">
