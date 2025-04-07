@@ -1,11 +1,12 @@
 import { ArrowRightIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useDispatch } from "react-redux";
-import { useUpdateTaskStatusMutation } from "../../redux/features/api/tasksApiSlice";
-import { removeTask } from "../../redux/features/tasks/tasksSlice";
+import {
+  useDeleteTaskMutation,
+  useUpdateTaskStatusMutation,
+} from "../../redux/features/api/tasksApiSlice";
 
 const TaskCard = ({ task }) => {
-  const dispatch = useDispatch();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
+  const [deleteTask] = useDeleteTaskMutation();
 
   const handleStatusUpdate = async () => {
     try {
@@ -41,6 +42,21 @@ const TaskCard = ({ task }) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      console.log("Task object before deletion:", task);
+      const taskId = task._id || task.id;
+      console.log("Attempting to delete task with ID:", taskId);
+      const result = await deleteTask(taskId).unwrap();
+      console.log("Delete successful, result:", result);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      console.error("Error status:", error.status);
+      console.error("Error data:", error.data);
+      console.error("Full error object:", error);
+    }
+  };
+
   return (
     <div className="bg-secondary/10 rounded-md p-5">
       <h1
@@ -57,10 +73,7 @@ const TaskCard = ({ task }) => {
       <div className="flex justify-between mt-3">
         <p>{task?.deadline}</p>
         <div className="flex gap-3">
-          <button
-            onClick={() => dispatch(removeTask(task._id || task.id))}
-            title="Delete"
-          >
+          <button onClick={handleDelete} title="Delete">
             <TrashIcon className="h-5 w-5 text-red-500" />
           </button>
           <button onClick={handleStatusUpdate} title="In progress">
