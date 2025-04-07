@@ -5,8 +5,9 @@ import {
 import { useState } from "react";
 import { useUpdateTaskStatusMutation } from "../../redux/features/api/tasksApiSlice";
 import Modal from "../ui/Modal";
+import MyTasksSkeleton from "./MyTasksSkeleton";
 
-const MyTasks = ({ tasks }) => {
+const MyTasks = ({ tasks, isLoading }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
@@ -33,6 +34,10 @@ const MyTasks = ({ tasks }) => {
     setSelectedTask(task);
     setIsOpen(true);
   };
+
+  if (isLoading) {
+    return <MyTasksSkeleton />;
+  }
 
   return (
     <div className="flex flex-col h-full">

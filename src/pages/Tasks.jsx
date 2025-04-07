@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import AddTaskModal from "../components/tasks/AddTaskModal";
 import MyTasks from "../components/tasks/MyTasks";
 import TaskCard from "../components/tasks/TaskCard";
+import TaskCardSkeleton from "../components/tasks/TaskCardSkeleton";
+import TaskStatsSkeleton from "../components/tasks/TaskStatsSkeleton";
 import MenuDropdown from "../components/ui/MenuDropdown";
 import { useGetTasksQuery } from "../redux/features/api/tasksApiSlice";
 import { auth } from "../utils/firebase.config";
@@ -40,8 +42,29 @@ const Tasks = () => {
     return task._id || task.id;
   };
 
-  if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading tasks</div>;
+
+  const renderTaskColumn = (title, tasks = [], count) => (
+    <div className="flex-1 min-w-0">
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
+          <h2 className="text-sm md:text-base font-medium">{title}</h2>
+          <span className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md text-sm">
+            {count}
+          </span>
+        </div>
+        <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
+          {isLoading
+            ? Array(3)
+                .fill(0)
+                .map((_, index) => <TaskCardSkeleton key={index} />)
+            : tasks.map((item) => (
+                <TaskCard key={getTaskId(item)} task={item} />
+              ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -80,69 +103,30 @@ const Tasks = () => {
             </div>
           </div>
 
+          {/* Task Stats */}
+          {isLoading ? (
+            <div className="px-4 md:px-10">
+              <TaskStatsSkeleton />
+            </div>
+          ) : null}
+
           {/* Task Columns */}
           <div className="px-4 md:px-10 pb-5 flex flex-col md:flex-row gap-4 md:gap-5">
-            {/* Up Next Column */}
-            <div className="flex-1 min-w-0">
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
-                  <h2 className="text-sm md:text-base font-medium">Up Next</h2>
-                  <span className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md text-sm">
-                    {myPendingTasks?.length + othersPendingTasks?.length}
-                  </span>
-                </div>
-                <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
-                  {myPendingTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                  {othersPendingTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* In Progress Column */}
-            <div className="flex-1 min-w-0">
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
-                  <h2 className="text-sm md:text-base font-medium">
-                    In Progress
-                  </h2>
-                  <span className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md text-sm">
-                    {myRunningTasks?.length + othersRunningTasks?.length}
-                  </span>
-                </div>
-                <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
-                  {myRunningTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                  {othersRunningTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Done Column */}
-            <div className="flex-1 min-w-0">
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
-                  <h2 className="text-sm md:text-base font-medium">Done</h2>
-                  <span className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md text-sm">
-                    {myDoneTasks?.length + othersDoneTasks?.length}
-                  </span>
-                </div>
-                <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
-                  {myDoneTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                  {othersDoneTasks?.map((item) => (
-                    <TaskCard key={getTaskId(item)} task={item} />
-                  ))}
-                </div>
-              </div>
-            </div>
+            {renderTaskColumn(
+              "Up Next",
+              [...myPendingTasks, ...othersPendingTasks],
+              myPendingTasks?.length + othersPendingTasks?.length
+            )}
+            {renderTaskColumn(
+              "In Progress",
+              [...myRunningTasks, ...othersRunningTasks],
+              myRunningTasks?.length + othersRunningTasks?.length
+            )}
+            {renderTaskColumn(
+              "Done",
+              [...myDoneTasks, ...othersDoneTasks],
+              myDoneTasks?.length + othersDoneTasks?.length
+            )}
           </div>
 
           {/* Members and My Tasks Section */}
@@ -150,21 +134,32 @@ const Tasks = () => {
             <div className="mb-6">
               <h2 className="text-lg md:text-xl font-medium mb-3">Members</h2>
               <div className="flex flex-wrap gap-2 md:gap-3">
-                {users.map((user) => (
-                  <div
-                    key={user.uid}
-                    className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
-                  >
-                    <img
-                      src={user.photoURL || "https://via.placeholder.com/40"}
-                      alt={user.displayName}
-                      className="object-cover h-full w-full"
-                    />
-                  </div>
-                ))}
+                {isLoading
+                  ? Array(4)
+                      .fill(0)
+                      .map((_, index) => (
+                        <div
+                          key={index}
+                          className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
+                        />
+                      ))
+                  : users.map((user) => (
+                      <div
+                        key={user.uid}
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
+                      >
+                        <img
+                          src={
+                            user.photoURL || "https://via.placeholder.com/40"
+                          }
+                          alt={user.displayName}
+                          className="object-cover h-full w-full"
+                        />
+                      </div>
+                    ))}
               </div>
             </div>
-            <MyTasks tasks={tasks} />
+            <MyTasks tasks={tasks} isLoading={isLoading} />
           </div>
         </div>
       </div>
