@@ -136,6 +136,26 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
           )}
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Status
+          </label>
+          <select
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            {...register("status", { required: "Status is required" })}
+            defaultValue="pending"
+          >
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          {errors.status && (
+            <span className="text-red-500 text-sm">
+              {errors.status.message}
+            </span>
+          )}
+        </div>
+
         <div className="flex justify-end space-x-3 pt-4">
           <button
             type="button"
