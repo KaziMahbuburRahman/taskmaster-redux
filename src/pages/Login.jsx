@@ -1,25 +1,47 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
 import { signInUser } from "../redux/features/tasks/userSlice";
-import { auth } from "../utils/firebase.config";
+import { auth, db } from "../utils/firebase.config";
+
 const Login = () => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const onSubmit = ({ email, password }) => {
     // Email Password Login
-
     dispatch(signInUser({ email, password }));
     navigate("/");
   };
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    navigate("/");
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // If user doesn't exist, create a new document
+        await setDoc(userDocRef, {
+          displayName: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          photoURL: user.photoURL,
+          createdAt: new Date().toISOString(),
+        });
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error during Google sign in:", error);
+    }
   };
 
   return (
