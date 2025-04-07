@@ -4,13 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { setUser, toggleLoading } from "../../redux/features/tasks/userSlice";
 import { auth } from "../../utils/firebase.config";
+import Preloader from "../shared/Preloader";
 
 const PrivateRoute = ({ children }) => {
   const { pathname } = useLocation();
   const { email, isLoading } = useSelector((state) => state.users);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // Extract only serializable properties from the user object
         const serializableUser = {
@@ -25,20 +27,22 @@ const PrivateRoute = ({ children }) => {
       }
     });
 
-    // return () => {
-    //   second;
-    // };
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [dispatch]);
 
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
+  // Show nothing while checking authentication
+  if (isLoading) {
+    return <Preloader />;
+  }
 
+  // If not loading and no user, redirect to login
   if (!email) {
     return <Navigate to="/login" state={{ path: pathname }} />;
-  } else {
-    return children;
   }
+
+  // If we have a user, render the protected content
+  return children;
 };
 
 export default PrivateRoute;
