@@ -1,9 +1,7 @@
+import ComingSoon from "../components/shared/ComingSoon";
+
 const Profile = () => {
-  return (
-    <div>
-      <h1>Profile </h1>
-    </div>
-  );
+  return <ComingSoon />;
 };
 
 export default Profile;
