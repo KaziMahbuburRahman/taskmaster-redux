@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { setUser, toggleLoading } from "../../redux/features/tasks/userSlice";
-import auth from "../../utils/firebase.config";
+import { auth } from "../../utils/firebase.config";
 import Loading from "./Loading";
 
 const PrivateRoute = ({ children }) => {
@@ -13,8 +13,14 @@ const PrivateRoute = ({ children }) => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        dispatch(setUser(user));
-        console.log(user);
+        // Extract only serializable properties from the user object
+        const serializableUser = {
+          displayName: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          photoURL: user.photoURL,
+        };
+        dispatch(setUser(serializableUser));
       } else {
         dispatch(toggleLoading(false));
       }
@@ -23,7 +29,7 @@ const PrivateRoute = ({ children }) => {
     // return () => {
     //   second;
     // };
-  }, []);
+  }, [dispatch]);
 
   if (isLoading) {
     return <Loading />;
