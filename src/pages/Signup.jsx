@@ -45,16 +45,23 @@ const Signup = () => {
   // };
 
   return (
-    <div className="flex max-w-7xl mx-auto h-screen items-center">
-      <div className="w-1/2">
+    <div className="flex flex-col md:flex-row max-w-7xl mx-auto min-h-screen items-center p-4">
+      <div className="w-full md:w-1/2 hidden md:block">
         <img src={loginImage} className="h-full w-full" alt="" />
       </div>
-      <div className="w-1/2  grid place-items-center">
-        <div className="bg-primary/5 w-full max-w-sm rounded-lg grid place-items-center p-10">
-          <h1 className="mb-10 font-medium text-2xl">Sign up</h1>
-          <form className="space-y-5 w-full" onSubmit={handleSubmit(onSubmit)}>
+      <div className="w-full md:w-1/2 grid place-items-center">
+        <div className="bg-primary/5 w-full max-w-sm rounded-lg grid place-items-center p-6 md:p-10">
+          <h1 className="mb-6 md:mb-10 font-medium text-xl md:text-2xl">
+            Sign up
+          </h1>
+          <form
+            className="space-y-4 md:space-y-5 w-full"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex flex-col items-start">
-              <label htmlFor="email">Name</label>
+              <label htmlFor="email" className="mb-1">
+                Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -63,7 +70,9 @@ const Signup = () => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email" className="mb-1">
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -72,7 +81,9 @@ const Signup = () => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password" className="mb-1">
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
@@ -81,7 +92,9 @@ const Signup = () => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <label htmlFor="confirm-password">Confirm Password</label>
+              <label htmlFor="confirm-password" className="mb-1">
+                Confirm Password
+              </label>
               <input
                 type="password"
                 id="confirm-password"
@@ -89,7 +102,7 @@ const Signup = () => {
                 {...register("confirmPassword")}
               />
             </div>
-            <div className="!mt-8 ">
+            <div className="!mt-6 md:!mt-8">
               <button
                 type="submit"
                 className="btn btn-primary w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
@@ -99,7 +112,7 @@ const Signup = () => {
               </button>
             </div>
             <div>
-              <p>
+              <p className="text-sm md:text-base">
                 Already have an account?{" "}
                 <span
                   className="text-primary hover:underline cursor-pointer"
