@@ -32,58 +32,58 @@ const Tasks = () => {
         {/* Header Skeleton */}
         <div className="px-4 md:px-10 pt-5 md:pt-10 pb-5">
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0 md:justify-between">
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
             <div className="flex items-center gap-3 md:gap-5">
               <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
               <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
-              <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 w-28 bg-gray-200 rounded-md animate-pulse"></div>
               <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
             </div>
           </div>
         </div>
 
-        {/* Task Stats Skeleton */}
-        {/* <div className="px-4 md:px-10">
-          <TaskStatsSkeleton />
-        </div> */}
-
-        {/* Task Columns Skeleton */}
-        <div className="px-4 md:px-10 pb-5 flex flex-col md:flex-row gap-4 md:gap-5">
-          {[1, 2, 3].map((index) => (
-            <div key={index} className="flex-1 min-w-0">
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
-                  <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-6 w-6 bg-gray-200 rounded-md animate-pulse"></div>
+        {/* Main Content Skeleton */}
+        <div className="flex flex-col lg:flex-row justify-between flex-grow">
+          <div className="flex flex-col lg:flex-col gap-5 px-4 md:px-10 pb-5 w-full">
+            {/* Task Columns Skeleton */}
+            <div className="flex-grow flex flex-col md:flex-row gap-4 md:gap-5">
+              {[1, 2, 3].map((index) => (
+                <div key={index} className="flex-1 min-w-0">
+                  <div className="bg-white rounded-lg shadow-sm h-full flex flex-col">
+                    <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
+                      <div className="h-5 w-24 bg-gray-300 rounded animate-pulse"></div>
+                      <div className="h-6 w-6 bg-primary/40 rounded-md animate-pulse"></div>
+                    </div>
+                    <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3 flex-grow">
+                      {Array(5)
+                        .fill(0)
+                        .map((_, i) => (
+                          <TaskCardSkeleton key={i} />
+                        ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
-                  {Array(3)
-                    .fill(0)
-                    .map((_, i) => (
-                      <TaskCardSkeleton key={i} />
-                    ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Members and My Tasks Section Skeleton */}
-        <div className="border-t-2 lg:border-t-0 bg-white lg:bg-transparent px-4 md:px-10 py-5 lg:flex lg:flex-col">
-          <div className="mb-6">
-            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="flex flex-wrap gap-2 md:gap-3">
-              {Array(4)
-                .fill(0)
-                .map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
-                  ></div>
-                ))}
+              ))}
             </div>
           </div>
-          <MyTasksSkeleton />
+
+          {/* Members and My Tasks Section Skeleton */}
+          <div className="lg:w-96 border-t-2 lg:border-t-0 bg-white lg:bg-transparent py-5 lg:py-0 lg:mt-10 lg:border-l-2 lg:border-secondary/20 px-4">
+            <div className="mb-6">
+              <div className="h-6 w-28 bg-gray-300 rounded animate-pulse mb-3"></div>
+              <div className="flex flex-wrap gap-2 md:gap-3">
+                {Array(6)
+                  .fill(0)
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
+                    ></div>
+                  ))}
+              </div>
+            </div>
+            <MyTasksSkeleton />
+          </div>
         </div>
       </div>
     );
