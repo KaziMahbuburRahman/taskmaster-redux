@@ -13,7 +13,9 @@ const MyTasks = ({ tasks, isLoading }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const currentUserName = auth.currentUser?.displayName;
-  const filteredTasks = tasks.filter((task) => task.assignTo === currentUserName);
+  const filteredTasks = tasks.filter(
+    (task) => task.assignTo === currentUserName
+  );
 
   const getTaskId = (task) => {
     return task._id || task.id;
