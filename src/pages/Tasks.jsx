@@ -1,5 +1,6 @@
 import { BellIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import AddTaskModal from "../components/tasks/AddTaskModal";
 import MyTasks from "../components/tasks/MyTasks";
 import TaskCard from "../components/tasks/TaskCard";
@@ -9,10 +10,15 @@ import { useGetTasksQuery } from "../redux/features/api/tasksApiSlice";
 const Tasks = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
+  const { users } = useSelector((state) => state.allUsers);
 
   const pendingTasks = tasks?.filter((item) => item.status === "pending");
   const runningTasks = tasks?.filter((item) => item.status === "in-progress");
   const doneTasks = tasks?.filter((item) => item.status === "completed");
+
+  const getTaskId = (task) => {
+    return task._id || task.id;
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading tasks</div>;
@@ -61,7 +67,7 @@ const Tasks = () => {
               </div>
               <div className="space-y-3">
                 {pendingTasks?.map((item) => (
-                  <TaskCard key={item.id} task={item} />
+                  <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
             </div>
@@ -74,7 +80,7 @@ const Tasks = () => {
               </div>
               <div className="space-y-3">
                 {runningTasks?.map((item) => (
-                  <TaskCard key={item.id} task={item} />
+                  <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
             </div>
@@ -87,7 +93,7 @@ const Tasks = () => {
               </div>
               <div className="space-y-3">
                 {doneTasks?.map((item) => (
-                  <TaskCard key={item.id} task={item} />
+                  <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
             </div>
@@ -97,41 +103,18 @@ const Tasks = () => {
           <div>
             <h1 className="text-xl">Members</h1>
             <div className="flex gap-3 mt-3">
-              <div className="h-10 w-10 rounded-xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                  alt=""
-                  className="object-cover h-full w-full "
-                />
-              </div>
-              <div className="h-10 w-10 rounded-xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                  alt=""
-                  className="object-cover h-full w-full "
-                />
-              </div>
-              <div className="h-10 w-10 rounded-xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                  alt=""
-                  className="object-cover h-full w-full "
-                />
-              </div>
-              <div className="h-10 w-10 rounded-xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                  alt=""
-                  className="object-cover h-full w-full "
-                />
-              </div>
-              <div className="h-10 w-10 rounded-xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                  alt=""
-                  className="object-cover h-full w-full "
-                />
-              </div>
+              {users.map((user) => (
+                <div
+                  key={user.uid}
+                  className="h-10 w-10 rounded-xl overflow-hidden"
+                >
+                  <img
+                    src={user.photoURL || "https://via.placeholder.com/40"}
+                    alt={user.displayName}
+                    className="object-cover h-full w-full"
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <MyTasks tasks={tasks} />
