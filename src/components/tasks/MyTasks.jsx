@@ -4,6 +4,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useUpdateTaskStatusMutation } from "../../redux/features/api/tasksApiSlice";
+import { auth } from "../../utils/firebase.config";
 import Modal from "../ui/Modal";
 import MyTasksSkeleton from "./MyTasksSkeleton";
 
@@ -11,7 +12,8 @@ const MyTasks = ({ tasks, isLoading }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
-  const filteredTasks = tasks.filter((task) => task.assignTo === "Mir Hussain");
+  const currentUserName = auth.currentUser?.displayName;
+  const filteredTasks = tasks.filter((task) => task.assignTo === currentUserName);
 
   const getTaskId = (task) => {
     return task._id || task.id;
