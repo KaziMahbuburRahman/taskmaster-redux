@@ -1,9 +1,7 @@
+import ComingSoon from "../components/shared/ComingSoon";
+
 const Settings = () => {
-  return (
-    <div>
-      <h1>Settings </h1>
-    </div>
-  );
+  return <ComingSoon />;
 };
 
 export default Settings;
