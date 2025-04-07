@@ -6,15 +6,35 @@ import MyTasks from "../components/tasks/MyTasks";
 import TaskCard from "../components/tasks/TaskCard";
 import MenuDropdown from "../components/ui/MenuDropdown";
 import { useGetTasksQuery } from "../redux/features/api/tasksApiSlice";
+import { auth } from "../utils/firebase.config";
 
 const Tasks = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
   const { users } = useSelector((state) => state.allUsers);
+  console.log("users", users);
+  // const currentUserName = users?.find((user) => user.uid === currentUserName?.uid)
+  console.log("all tasks", tasks);
+  const currentUserName = auth.currentUser?.displayName;
+  const myPendingTasks = tasks?.filter(
+    (item) => item.status === "pending" && item.assignTo === currentUserName
+  );
+  const myRunningTasks = tasks?.filter(
+    (item) => item.status === "in-progress" && item.assignTo === currentUserName
+  );
+  const myDoneTasks = tasks?.filter(
+    (item) => item.status === "completed" && item.assignTo === currentUserName
+  );
 
-  const pendingTasks = tasks?.filter((item) => item.status === "pending");
-  const runningTasks = tasks?.filter((item) => item.status === "in-progress");
-  const doneTasks = tasks?.filter((item) => item.status === "completed");
+  const othersPendingTasks = tasks?.filter(
+    (item) => item.status === "pending" && item.assignTo !== currentUserName
+  );
+  const othersRunningTasks = tasks?.filter(
+    (item) => item.status === "in-progress" && item.assignTo !== currentUserName
+  );
+  const othersDoneTasks = tasks?.filter(
+    (item) => item.status === "completed" && item.assignTo !== currentUserName
+  );
 
   const getTaskId = (task) => {
     return task._id || task.id;
@@ -62,11 +82,16 @@ const Tasks = () => {
               <div className="flex sticky top-0  justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
                 <h1>Up Next</h1>
                 <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                  {pendingTasks?.length}
+                  {myPendingTasks?.length + othersPendingTasks?.length}
                 </p>
               </div>
               <div className="space-y-3">
-                {pendingTasks?.map((item) => (
+                {/* console */}
+
+                {myPendingTasks?.map((item) => (
+                  <TaskCard key={getTaskId(item)} task={item} />
+                ))}
+                {othersPendingTasks?.map((item) => (
                   <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
@@ -75,11 +100,14 @@ const Tasks = () => {
               <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
                 <h1>In Progress</h1>
                 <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                  {runningTasks?.length}
+                  {myRunningTasks?.length + othersRunningTasks?.length}
                 </p>
               </div>
               <div className="space-y-3">
-                {runningTasks?.map((item) => (
+                {myRunningTasks?.map((item) => (
+                  <TaskCard key={getTaskId(item)} task={item} />
+                ))}
+                {othersRunningTasks?.map((item) => (
                   <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
@@ -88,11 +116,14 @@ const Tasks = () => {
               <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
                 <h1>Done</h1>
                 <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                  {doneTasks?.length}
+                  {myDoneTasks?.length + othersDoneTasks?.length}
                 </p>
               </div>
               <div className="space-y-3">
-                {doneTasks?.map((item) => (
+                {myDoneTasks?.map((item) => (
+                  <TaskCard key={getTaskId(item)} task={item} />
+                ))}
+                {othersDoneTasks?.map((item) => (
                   <TaskCard key={getTaskId(item)} task={item} />
                 ))}
               </div>
