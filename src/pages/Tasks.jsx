@@ -1,11 +1,13 @@
 import { BellIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 import AddTaskModal from "../components/tasks/AddTaskModal";
 import MyTasks from "../components/tasks/MyTasks";
+import MyTasksSkeleton from "../components/tasks/MyTasksSkeleton";
 import TaskCard from "../components/tasks/TaskCard";
 import TaskCardSkeleton from "../components/tasks/TaskCardSkeleton";
-import TaskStatsSkeleton from "../components/tasks/TaskStatsSkeleton";
 import MenuDropdown from "../components/ui/MenuDropdown";
 import { useGetTasksQuery } from "../redux/features/api/tasksApiSlice";
 import { auth } from "../utils/firebase.config";
@@ -14,6 +16,83 @@ const Tasks = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
   const { users } = useSelector((state) => state.allUsers);
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      setIsAuthLoaded(true);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (!isAuthLoaded) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        {/* Header Skeleton */}
+        <div className="px-4 md:px-10 pt-5 md:pt-10 pb-5">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0 md:justify-between">
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex items-center gap-3 md:gap-5">
+              <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
+              <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
+              <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-9 w-9 md:h-10 md:w-10 bg-gray-200 rounded-xl animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Task Stats Skeleton */}
+        {/* <div className="px-4 md:px-10">
+          <TaskStatsSkeleton />
+        </div> */}
+
+        {/* Task Columns Skeleton */}
+        <div className="px-4 md:px-10 pb-5 flex flex-col md:flex-row gap-4 md:gap-5">
+          {[1, 2, 3].map((index) => (
+            <div key={index} className="flex-1 min-w-0">
+              <div className="bg-white rounded-lg shadow-sm">
+                <div className="sticky top-0 flex justify-between items-center bg-[#D3DDF9] p-4 rounded-t-lg">
+                  <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-6 w-6 bg-gray-200 rounded-md animate-pulse"></div>
+                </div>
+                <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
+                  {Array(3)
+                    .fill(0)
+                    .map((_, i) => (
+                      <TaskCardSkeleton key={i} />
+                    ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Members and My Tasks Section Skeleton */}
+        <div className="border-t-2 md:border-t-0 bg-white md:bg-transparent px-4 md:px-10 py-5">
+          <div className="mb-6">
+            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              {Array(4)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
+                  ></div>
+                ))}
+            </div>
+          </div>
+          <MyTasksSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (!auth.currentUser) {
+    return <Navigate to="/login" />;
+  }
+
   console.log("users", users);
   // const currentUserName = users?.find((user) => user.uid === currentUserName?.uid)
   console.log("all tasks", tasks);
@@ -93,8 +172,11 @@ const Tasks = () => {
                 <MenuDropdown>
                   <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl overflow-hidden">
                     <img
-                      src={auth.currentUser.photoURL}
-                      alt={auth.currentUser.displayName}
+                      src={
+                        auth.currentUser?.photoURL ||
+                        "https://ui-avatars.com/api/?name=User&background=random"
+                      }
+                      alt={auth.currentUser?.displayName || "User"}
                       className="object-cover h-full w-full"
                     />
                   </div>
@@ -102,13 +184,6 @@ const Tasks = () => {
               </div>
             </div>
           </div>
-
-          {/* Task Stats */}
-          {isLoading ? (
-            <div className="px-4 md:px-10">
-              <TaskStatsSkeleton />
-            </div>
-          ) : null}
 
           {/* Task Columns */}
           <div className="px-4 md:px-10 pb-5 flex flex-col md:flex-row gap-4 md:gap-5">
