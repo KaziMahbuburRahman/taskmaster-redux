@@ -4,11 +4,14 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import auth from "../../../utils/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../../utils/firebase.config";
 
 const initialState = {
   name: "",
   email: "",
+  uid: "",
+  photoURL: "",
   isLoading: true,
   isError: false,
   error: "",
@@ -18,23 +21,34 @@ export const createUser = createAsyncThunk(
   "userSlice/createUser",
   async ({ name, email, password }) => {
     const data = await createUserWithEmailAndPassword(auth, email, password);
-    updateProfile(auth.currentUser, {
+    await updateProfile(auth.currentUser, {
       displayName: name,
     });
-    // console.log(data);
-    return data;
-  }
-);
-export const signInUser = createAsyncThunk(
-  "userSlice/signInUser",
-  async ({ email, password }) => {
-    const data = await signInWithEmailAndPassword(auth, email, password);
-    console.log(data);
+
+    // Store user information in Firestore
+    await setDoc(doc(db, "users", data.user.uid), {
+      displayName: name,
+      email: email,
+      uid: data.user.uid,
+      createdAt: new Date().toISOString(),
+    });
+
     return {
       email: data.user.email,
       name: data.user.displayName,
       uid: data.user.uid,
-      // Add any other serializable fields you need
+    };
+  }
+);
+
+export const signInUser = createAsyncThunk(
+  "userSlice/signInUser",
+  async ({ email, password }) => {
+    const data = await signInWithEmailAndPassword(auth, email, password);
+    return {
+      email: data.user.email,
+      name: data.user.displayName,
+      uid: data.user.uid,
     };
   }
 );
@@ -46,6 +60,8 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.name = action.payload.displayName;
       state.email = action.payload.email;
+      state.uid = action.payload.uid;
+      state.photoURL = action.payload.photoURL;
       state.isLoading = false;
       state.isError = false;
       state.error = "";
@@ -56,55 +72,53 @@ const userSlice = createSlice({
     logout: (state) => {
       state.name = "";
       state.email = "";
+      state.uid = "";
+      state.photoURL = "";
       state.isLoading = false;
       state.isError = false;
       state.error = "";
     },
   },
   extraReducers: (builder) => {
-    // Add reducers for additional action types here, and handle loading state as needed
-    builder.addCase(createUser.pending, (state) => {
-      // Add user to the state array
-      state.isLoading = true;
-      state.isError = false;
-      state.email = "";
-      state.name = "";
-      state.error = "";
-    }),
-      builder.addCase(createUser.fulfilled, (state, { payload }) => {
-        // Add user to the state array
+    builder
+      .addCase(createUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.email = "";
+        state.name = "";
+        state.error = "";
+      })
+      .addCase(createUser.fulfilled, (state, { payload }) => {
         state.isLoading = false;
         state.isError = false;
         state.email = payload.email;
         state.name = payload.name;
+        state.uid = payload.uid;
         state.error = "";
-      }),
-      builder.addCase(createUser.rejected, (state, action) => {
-        // Add user to the state array
+      })
+      .addCase(createUser.rejected, (state, action) => {
         state.isLoading = true;
         state.isError = true;
         state.email = "";
         state.name = "";
         state.error = action.error.message;
-      });
-    builder.addCase(signInUser.pending, (state) => {
-      // Add user to the state array
-      state.isLoading = true;
-      state.isError = false;
-      state.email = "";
-      state.name = "";
-      state.error = "";
-    }),
-      builder.addCase(signInUser.fulfilled, (state, { payload }) => {
-        // Add user to the state array
+      })
+      .addCase(signInUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.email = "";
+        state.name = "";
+        state.error = "";
+      })
+      .addCase(signInUser.fulfilled, (state, { payload }) => {
         state.isLoading = false;
         state.isError = false;
         state.email = payload.email;
         state.name = payload.name;
+        state.uid = payload.uid;
         state.error = "";
-      }),
-      builder.addCase(signInUser.rejected, (state, action) => {
-        // Add user to the state array
+      })
+      .addCase(signInUser.rejected, (state, action) => {
         state.isLoading = true;
         state.isError = true;
         state.email = "";
