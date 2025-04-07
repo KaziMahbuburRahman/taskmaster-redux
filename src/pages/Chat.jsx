@@ -1,9 +1,7 @@
+import ComingSoon from "../components/shared/ComingSoon";
+
 const Chat = () => {
-  return (
-    <div>
-      <h1>Chat</h1>
-    </div>
-  );
+  return <ComingSoon />;
 };
 
 export default Chat;
