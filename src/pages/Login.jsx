@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
-import { signInUser } from "../redux/features/tasks/userSlice";
+import { setUser, signInUser } from "../redux/features/tasks/userSlice";
 import { auth, db } from "../utils/firebase.config";
 
 const Login = () => {
@@ -38,6 +38,17 @@ const Login = () => {
         });
       }
 
+      // Explicitly update the Redux state before navigating
+      dispatch(
+        setUser({
+          displayName: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          photoURL: user.photoURL,
+        })
+      );
+
+      // Now navigate
       navigate("/");
     } catch (error) {
       console.error("Error during Google sign in:", error);
