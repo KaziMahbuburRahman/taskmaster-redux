@@ -1,10 +1,24 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-
+import { useDispatch, useSelector } from "react-redux";
 import { useCreateTaskMutation } from "../../redux/features/api/tasksApiSlice";
+import { fetchUsers } from "../../redux/features/tasks/usersSlice";
 import Modal from "../ui/Modal";
 
 const AddTaskModal = ({ isOpen, setIsOpen }) => {
   const [createTask] = useCreateTaskMutation();
+  const dispatch = useDispatch();
+  const { users, isLoading } = useSelector((state) => state.allUsers);
+
+  useEffect(() => {
+    console.log("Fetching users...");
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log("Current users state:", { users, isLoading });
+  }, [users, isLoading]);
+
   const {
     register,
     handleSubmit,
@@ -82,11 +96,18 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
             {...register("assignTo", { required: "Assignee is required" })}
           >
             <option value="">Select assignee</option>
-            <option value="Mir Hussain">Mir Hussain</option>
-            <option value="Mezba Abedin">Mezba Abedin</option>
-            <option value="Rahatul Islam">Rahatul Islam</option>
-            <option value="Tanmoy Parvez">Tanmoy Parvez</option>
-            <option value="Fahim Ahmed">Fahim Ahmed</option>
+            {isLoading ? (
+              <option value="">Loading users...</option>
+            ) : (
+              users.map((user) => {
+                console.log("Rendering user option:", user);
+                return (
+                  <option key={user.id} value={user.displayName}>
+                    {user.displayName}
+                  </option>
+                );
+              })
+            )}
           </select>
           {errors.assignTo && (
             <span className="text-red-500 text-sm">
