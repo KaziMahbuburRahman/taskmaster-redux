@@ -34,11 +34,11 @@ const PrivateRoute = ({ children }) => {
   //   return <Loading />;
   // }
 
-  if (!isLoading && !email) {
+  if (!email) {
     return <Navigate to="/login" state={{ path: pathname }} />;
+  } else {
+    return children;
   }
-
-  return children;
 };
 
 export default PrivateRoute;
