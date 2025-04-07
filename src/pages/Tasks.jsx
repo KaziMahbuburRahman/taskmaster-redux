@@ -69,7 +69,7 @@ const Tasks = () => {
         </div>
 
         {/* Members and My Tasks Section Skeleton */}
-        <div className="border-t-2 md:border-t-0 bg-white md:bg-transparent px-4 md:px-10 py-5">
+        <div className="border-t-2 lg:border-t-0 bg-white lg:bg-transparent px-4 md:px-10 py-5 lg:flex lg:flex-col">
           <div className="mb-6">
             <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
             <div className="flex flex-wrap gap-2 md:gap-3">
@@ -132,7 +132,7 @@ const Tasks = () => {
             {count}
           </span>
         </div>
-        <div className="h-[60vh] md:h-[70vh] overflow-y-auto p-4 space-y-3">
+        <div className="h-[60vh] md:h-[70vh] overflow-y-auto py-3 space-y-3">
           {isLoading
             ? Array(3)
                 .fill(0)
@@ -151,41 +151,40 @@ const Tasks = () => {
 
       <div className="min-h-screen flex flex-col">
         {/* Main Content */}
-        <div className="flex flex-col flex-grow">
-          {/* Header Section */}
-          <div className="px-4 md:px-10 pt-5 md:pt-10 pb-5">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0 md:justify-between">
-              <h1 className="font-semibold text-2xl md:text-3xl">Tasks</h1>
-              <div className="flex items-center gap-3 md:gap-5">
-                <button className="border-2 border-secondary/20 hover:border-primary hover:bg-primary rounded-xl h-9 w-9 md:h-10 md:w-10 grid place-content-center text-secondary hover:text-white transition-all">
-                  <MagnifyingGlassIcon className="h-5 w-5" />
-                </button>
-                <button className="border-2 border-secondary/20 hover:border-primary hover:bg-primary rounded-xl h-9 w-9 md:h-10 md:w-10 grid place-content-center text-secondary hover:text-white transition-all">
-                  <BellIcon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="btn btn-primary text-sm md:text-base px-3 py-2 md:px-4 md:py-2"
-                >
-                  Add Task
-                </button>
-                <MenuDropdown>
-                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl overflow-hidden">
-                    <img
-                      src={
-                        auth.currentUser?.photoURL ||
-                        "https://ui-avatars.com/api/?name=User&background=random"
-                      }
-                      alt={auth.currentUser?.displayName || "User"}
-                      className="object-cover h-full w-full"
-                    />
-                  </div>
-                </MenuDropdown>
+        <div className="flex flex-col lg:flex-row justify-between flex-grow">
+          <div className="flex flex-col lg:flex-col gap-5 px-4 md:px-10 pb-5 w-full">
+            {/* Header Section */}
+            <div className="px-4 md:px-10 pt-5 md:pt-10 pb-5">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0 md:justify-between">
+                <h1 className="font-semibold text-2xl md:text-3xl">Tasks</h1>
+                <div className="flex items-center gap-3 md:gap-5">
+                  <button className="border-2 border-secondary/20 hover:border-primary hover:bg-primary rounded-xl h-9 w-9 md:h-10 md:w-10 grid place-content-center text-secondary hover:text-white transition-all">
+                    <MagnifyingGlassIcon className="h-5 w-5" />
+                  </button>
+                  <button className="border-2 border-secondary/20 hover:border-primary hover:bg-primary rounded-xl h-9 w-9 md:h-10 md:w-10 grid place-content-center text-secondary hover:text-white transition-all">
+                    <BellIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="btn btn-primary text-sm md:text-base px-3 py-2 md:px-4 md:py-2"
+                  >
+                    Add Task
+                  </button>
+                  <MenuDropdown>
+                    <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl overflow-hidden">
+                      <img
+                        src={
+                          auth.currentUser?.photoURL ||
+                          "https://ui-avatars.com/api/?name=User&background=random"
+                        }
+                        alt={auth.currentUser?.displayName || "User"}
+                        className="object-cover h-full w-full"
+                      />
+                    </div>
+                  </MenuDropdown>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-5 px-4 md:px-10 pb-5">
             {/* Task Columns Container */}
             <div className="flex-grow flex flex-col md:flex-row gap-4 md:gap-5">
               {renderTaskColumn(
@@ -204,39 +203,38 @@ const Tasks = () => {
                 myDoneTasks?.length + othersDoneTasks?.length
               )}
             </div>
-
-            {/* Members and My Tasks Section */}
-            <div className="lg:w-80 border-t-2 lg:border-t-0 bg-white md:bg-transparent py-5 lg:py-0">
-              <div className="mb-6">
-                <h2 className="text-lg md:text-xl font-medium mb-3">Members</h2>
-                <div className="flex flex-wrap gap-2 md:gap-3">
-                  {isLoading
-                    ? Array(4)
-                        .fill(0)
-                        .map((_, index) => (
-                          <div
-                            key={index}
-                            className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
-                          />
-                        ))
-                    : users.map((user) => (
+          </div>
+          {/* Members and My Tasks Section */}
+          <div className="lg:w-96 border-t-2 lg:border-t-0 bg-white lg:bg-transparent py-5 lg:py-0 lg:flex lg:flex-col lg:mt-10 border-l-2 border-secondary/20 px-4">
+            <div className="mb-6">
+              <h2 className="text-lg md:text-xl font-medium mb-3">Members</h2>
+              <div className="flex flex-wrap gap-2 md:gap-3">
+                {isLoading
+                  ? Array(4)
+                      .fill(0)
+                      .map((_, index) => (
                         <div
-                          key={user.uid}
-                          className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
-                        >
-                          <img
-                            src={
-                              user.photoURL || "https://via.placeholder.com/40"
-                            }
-                            alt={user.displayName}
-                            className="object-cover h-full w-full"
-                          />
-                        </div>
-                      ))}
-                </div>
+                          key={index}
+                          className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
+                        />
+                      ))
+                  : users.map((user) => (
+                      <div
+                        key={user.uid}
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
+                      >
+                        <img
+                          src={
+                            user.photoURL || "https://via.placeholder.com/40"
+                          }
+                          alt={user.displayName}
+                          className="object-cover h-full w-full"
+                        />
+                      </div>
+                    ))}
               </div>
-              <MyTasks tasks={tasks} isLoading={isLoading} />
             </div>
+            <MyTasks tasks={tasks} isLoading={isLoading} />
           </div>
         </div>
       </div>
