@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/image/login.svg";
 import { signInUser } from "../redux/features/tasks/userSlice";
-import auth from "../utils/firebase.config";
+import { auth } from "../utils/firebase.config";
 const Login = () => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
