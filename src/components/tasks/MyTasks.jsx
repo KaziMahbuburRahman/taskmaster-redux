@@ -35,27 +35,36 @@ const MyTasks = ({ tasks }) => {
   };
 
   return (
-    <div>
-      <h1 className="text-xl my-3">My Tasks</h1>
-      <div className="h-[750px] overflow-auto space-y-3">
+    <div className="flex flex-col h-full">
+      <h1 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
+        My Tasks
+      </h1>
+      <div className="flex-1 h-[calc(100vh-12rem)] overflow-y-auto space-y-2 md:space-y-3 -mx-4 px-4">
         {filteredTasks.map((task) => (
           <div
             key={getTaskId(task)}
-            className="bg-secondary/10 rounded-md p-3 flex justify-between"
+            className="bg-secondary/10 rounded-md p-3 flex items-center justify-between gap-3"
           >
-            <h1>{task.title}</h1>
-            <div className="flex gap-3">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm md:text-base font-medium line-clamp-1">
+                {task.title}
+              </h2>
+              <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                Status: {task.status}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => handleViewDetails(task)}
-                className="grid place-content-center"
-                title="Details"
+                className="p-1.5 hover:bg-primary/10 rounded-md transition-colors"
+                title="View Details"
               >
                 <DocumentMagnifyingGlassIcon className="w-5 h-5 text-primary" />
               </button>
               <button
                 onClick={() => handleCompleteTask(task)}
-                className="grid place-content-center"
-                title="Done"
+                className="p-1.5 hover:bg-primary/10 rounded-md transition-colors"
+                title="Mark as Complete"
               >
                 <CheckIcon className="w-5 h-5 text-primary" />
               </button>
@@ -67,19 +76,28 @@ const MyTasks = ({ tasks }) => {
       <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Task Details">
         {selectedTask && (
           <div className="space-y-4">
-            <h1 className="text-xl font-semibold">{selectedTask.title}</h1>
-            <p className="text-gray-600">{selectedTask.description}</p>
-            <div className="flex gap-2">
-              <span className="px-2 py-1 bg-primary/10 text-primary rounded-md">
-                {selectedTask.status}
-              </span>
-              <span className="px-2 py-1 bg-secondary/10 text-secondary rounded-md">
-                {selectedTask.assignTo}
-              </span>
+            <div>
+              <h1 className="text-lg md:text-xl font-semibold mb-1">
+                {selectedTask.title}
+              </h1>
+              <div className="flex flex-wrap gap-2 mb-3">
+                <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-md">
+                  {selectedTask.status}
+                </span>
+                <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary rounded-md">
+                  {selectedTask.assignTo}
+                </span>
+              </div>
+              <p className="text-sm md:text-base text-gray-600">
+                {selectedTask.description}
+              </p>
             </div>
-            <p className="text-sm text-gray-500">
-              Created: {new Date(selectedTask.createdAt).toLocaleDateString()}
-            </p>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <p>Due: {selectedTask.deadline}</p>
+              <p>
+                Created: {new Date(selectedTask.createdAt).toLocaleDateString()}
+              </p>
+            </div>
           </div>
         )}
       </Modal>
