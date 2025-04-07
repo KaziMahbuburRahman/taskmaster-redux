@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { setUser, toggleLoading } from "../../redux/features/tasks/userSlice";
 import { auth } from "../../utils/firebase.config";
-import Loading from "./Loading";
 
 const PrivateRoute = ({ children }) => {
   const { pathname } = useLocation();
@@ -18,7 +17,7 @@ const PrivateRoute = ({ children }) => {
           displayName: user.displayName,
           email: user.email,
           uid: user.uid,
-          photoURL: user.photoURL,
+          photoURL: user?.photoURL,
         };
         dispatch(setUser(serializableUser));
       } else {
@@ -31,9 +30,9 @@ const PrivateRoute = ({ children }) => {
     // };
   }, [dispatch]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
 
   if (!isLoading && !email) {
     return <Navigate to="/login" state={{ path: pathname }} />;
