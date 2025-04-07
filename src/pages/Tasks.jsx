@@ -185,56 +185,58 @@ const Tasks = () => {
             </div>
           </div>
 
-          {/* Task Columns */}
-          <div className="px-4 md:px-10 pb-5 flex flex-col md:flex-row gap-4 md:gap-5">
-            {renderTaskColumn(
-              "Up Next",
-              [...myPendingTasks, ...othersPendingTasks],
-              myPendingTasks?.length + othersPendingTasks?.length
-            )}
-            {renderTaskColumn(
-              "In Progress",
-              [...myRunningTasks, ...othersRunningTasks],
-              myRunningTasks?.length + othersRunningTasks?.length
-            )}
-            {renderTaskColumn(
-              "Done",
-              [...myDoneTasks, ...othersDoneTasks],
-              myDoneTasks?.length + othersDoneTasks?.length
-            )}
-          </div>
-
-          {/* Members and My Tasks Section */}
-          <div className="border-t-2 md:border-t-0 bg-white md:bg-transparent px-4 md:px-10 py-5">
-            <div className="mb-6">
-              <h2 className="text-lg md:text-xl font-medium mb-3">Members</h2>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                {isLoading
-                  ? Array(4)
-                      .fill(0)
-                      .map((_, index) => (
-                        <div
-                          key={index}
-                          className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
-                        />
-                      ))
-                  : users.map((user) => (
-                      <div
-                        key={user.uid}
-                        className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
-                      >
-                        <img
-                          src={
-                            user.photoURL || "https://via.placeholder.com/40"
-                          }
-                          alt={user.displayName}
-                          className="object-cover h-full w-full"
-                        />
-                      </div>
-                    ))}
-              </div>
+          <div className="flex flex-col lg:flex-row gap-5 px-4 md:px-10 pb-5">
+            {/* Task Columns Container */}
+            <div className="flex-grow flex flex-col md:flex-row gap-4 md:gap-5">
+              {renderTaskColumn(
+                "Up Next",
+                [...myPendingTasks, ...othersPendingTasks],
+                myPendingTasks?.length + othersPendingTasks?.length
+              )}
+              {renderTaskColumn(
+                "In Progress",
+                [...myRunningTasks, ...othersRunningTasks],
+                myRunningTasks?.length + othersRunningTasks?.length
+              )}
+              {renderTaskColumn(
+                "Done",
+                [...myDoneTasks, ...othersDoneTasks],
+                myDoneTasks?.length + othersDoneTasks?.length
+              )}
             </div>
-            <MyTasks tasks={tasks} isLoading={isLoading} />
+
+            {/* Members and My Tasks Section */}
+            <div className="lg:w-80 border-t-2 lg:border-t-0 bg-white md:bg-transparent py-5 lg:py-0">
+              <div className="mb-6">
+                <h2 className="text-lg md:text-xl font-medium mb-3">Members</h2>
+                <div className="flex flex-wrap gap-2 md:gap-3">
+                  {isLoading
+                    ? Array(4)
+                        .fill(0)
+                        .map((_, index) => (
+                          <div
+                            key={index}
+                            className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gray-200 animate-pulse"
+                          />
+                        ))
+                    : users.map((user) => (
+                        <div
+                          key={user.uid}
+                          className="h-8 w-8 md:h-10 md:w-10 rounded-xl overflow-hidden"
+                        >
+                          <img
+                            src={
+                              user.photoURL || "https://via.placeholder.com/40"
+                            }
+                            alt={user.displayName}
+                            className="object-cover h-full w-full"
+                          />
+                        </div>
+                      ))}
+                </div>
+              </div>
+              <MyTasks tasks={tasks} isLoading={isLoading} />
+            </div>
           </div>
         </div>
       </div>
