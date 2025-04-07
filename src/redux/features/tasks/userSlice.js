@@ -25,11 +25,16 @@ export const createUser = createAsyncThunk(
       displayName: name,
     });
 
+    const defaultPhotoURL = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=random`;
+
     // Store user information in Firestore
     await setDoc(doc(db, "users", data.user.uid), {
       displayName: name,
       email: email,
       uid: data.user.uid,
+      photoURL: defaultPhotoURL,
       createdAt: new Date().toISOString(),
     });
 
@@ -37,6 +42,7 @@ export const createUser = createAsyncThunk(
       email: data.user.email,
       name: data.user.displayName,
       uid: data.user.uid,
+      photoURL: defaultPhotoURL,
     };
   }
 );
@@ -49,6 +55,11 @@ export const signInUser = createAsyncThunk(
       email: data.user.email,
       name: data.user.displayName,
       uid: data.user.uid,
+      photoURL:
+        data.user.photoURL ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          data.user.displayName
+        )}&background=random`,
     };
   }
 );
@@ -94,6 +105,7 @@ const userSlice = createSlice({
         state.email = payload.email;
         state.name = payload.name;
         state.uid = payload.uid;
+        state.photoURL = payload.photoURL;
         state.error = "";
       })
       .addCase(createUser.rejected, (state, action) => {
@@ -116,6 +128,7 @@ const userSlice = createSlice({
         state.email = payload.email;
         state.name = payload.name;
         state.uid = payload.uid;
+        state.photoURL = payload.photoURL;
         state.error = "";
       })
       .addCase(signInUser.rejected, (state, action) => {
