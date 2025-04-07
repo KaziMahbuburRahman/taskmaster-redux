@@ -8,10 +8,10 @@ import routes from "./routes/routes.jsx";
 import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <Toaster />
       <RouterProvider router={routes} />
     </Provider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
