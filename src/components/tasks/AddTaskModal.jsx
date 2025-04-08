@@ -28,7 +28,12 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
 
   const onSubmit = async (data) => {
     try {
-      await createTask(data).unwrap();
+      const taskData = {
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      await createTask(taskData).unwrap();
       setIsOpen(false);
       reset();
     } catch (error) {
