@@ -3,7 +3,6 @@ import {
   addDoc,
   collection,
   doc,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -13,14 +12,18 @@ import {
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers } from "../redux/features/tasks/usersSlice";
 import { db } from "../utils/firebase.config";
 
 const Chat = () => {
   const { currentUser } = useSelector((state) => state.users);
+  const { users, isLoading, isError, error } = useSelector(
+    (state) => state.allUsers
+  );
+  const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [users, setUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState({});
   const messagesEndRef = useRef(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -84,37 +87,19 @@ const Chat = () => {
     return () => unsubscribe();
   }, [currentUser?.uid]);
 
-  // Fetch all users
+  // Fetch all users using Redux
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (!currentUser?.uid) return;
+    if (currentUser?.uid) {
+      dispatch(fetchUsers());
+    }
+  }, [currentUser?.uid, dispatch]);
 
-      try {
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("uid", "!=", currentUser.uid));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          console.log("No users found");
-          setUsers([]);
-          return;
-        }
-
-        const usersList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        console.log("Fetched users:", usersList);
-        setUsers(usersList);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        toast.error("Failed to load users. Please try again later.");
-      }
-    };
-
-    fetchUsers();
-  }, [currentUser?.uid]);
+  // Show error toast if there's an error fetching users
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(error);
+    }
+  }, [isError, error]);
 
   // Fetch messages for selected user
   useEffect(() => {
