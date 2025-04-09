@@ -87,18 +87,29 @@ const Chat = () => {
   // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
+      if (!currentUser?.uid) return;
+
       try {
         const usersRef = collection(db, "users");
-        const q = query(usersRef, where("uid", "!=", currentUser?.uid));
+        const q = query(usersRef, where("uid", "!=", currentUser.uid));
         const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          console.log("No users found");
+          setUsers([]);
+          return;
+        }
+
         const usersList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
+        console.log("Fetched users:", usersList);
         setUsers(usersList);
       } catch (error) {
         console.error("Error fetching users:", error);
-        toast.error("Failed to load users");
+        toast.error("Failed to load users. Please try again later.");
       }
     };
 
