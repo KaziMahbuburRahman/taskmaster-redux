@@ -2,11 +2,13 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -19,8 +21,68 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [users, setUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState({});
   const messagesEndRef = useRef(null);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // Update current user's online status
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+
+    const userStatusRef = doc(db, "status", currentUser.uid);
+    const unsubscribe = onSnapshot(userStatusRef, (doc) => {
+      if (doc.exists()) {
+        setOnlineUsers((prev) => ({
+          ...prev,
+          [currentUser.uid]: doc.data().state === "online",
+        }));
+      }
+    });
+
+    // Set user as online
+    setDoc(userStatusRef, {
+      state: "online",
+      lastChanged: serverTimestamp(),
+    });
+
+    // Set user as offline when they disconnect
+    const handleBeforeUnload = () => {
+      setDoc(userStatusRef, {
+        state: "offline",
+        lastChanged: serverTimestamp(),
+      });
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      // Set user as offline when component unmounts
+      setDoc(userStatusRef, {
+        state: "offline",
+        lastChanged: serverTimestamp(),
+      });
+    };
+  }, [currentUser?.uid]);
+
+  // Listen to other users' online status
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+
+    const statusRef = collection(db, "status");
+    const q = query(statusRef, where("state", "==", "online"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const onlineStatus = {};
+      snapshot.forEach((doc) => {
+        onlineStatus[doc.id] = true;
+      });
+      setOnlineUsers(onlineStatus);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser?.uid]);
 
   // Fetch all users
   useEffect(() => {
@@ -114,14 +176,22 @@ const Chat = () => {
                 selectedUser?.uid === user.uid ? "bg-primary/10" : ""
               }`}
             >
-              <img
-                src={
-                  user.photoURL ||
-                  "https://ui-avatars.com/api/?name=User&background=random"
-                }
-                alt={user.displayName}
-                className="w-10 h-10 rounded-full"
-              />
+              <div className="relative">
+                <img
+                  src={
+                    user.photoURL ||
+                    "https://ui-avatars.com/api/?name=User&background=random"
+                  }
+                  alt={user.displayName}
+                  className="w-10 h-10 rounded-full"
+                />
+                <span
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                    onlineUsers[user.uid] ? "bg-green-500" : "bg-gray-400"
+                  }`}
+                  title={onlineUsers[user.uid] ? "Online" : "Offline"}
+                />
+              </div>
               <div>
                 <p className="font-medium">{user.displayName}</p>
                 <p className="text-sm text-gray-500">{user.email}</p>
@@ -138,14 +208,24 @@ const Chat = () => {
             {/* Chat Header */}
             <div className="border-b border-gray-200 p-4">
               <div className="flex items-center gap-3">
-                <img
-                  src={
-                    selectedUser.photoURL ||
-                    "https://ui-avatars.com/api/?name=User&background=random"
-                  }
-                  alt={selectedUser.displayName}
-                  className="w-10 h-10 rounded-full"
-                />
+                <div className="relative">
+                  <img
+                    src={
+                      selectedUser.photoURL ||
+                      "https://ui-avatars.com/api/?name=User&background=random"
+                    }
+                    alt={selectedUser.displayName}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <span
+                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                      onlineUsers[selectedUser.uid]
+                        ? "bg-green-500"
+                        : "bg-gray-400"
+                    }`}
+                    title={onlineUsers[selectedUser.uid] ? "Online" : "Offline"}
+                  />
+                </div>
                 <div>
                   <p className="font-medium">{selectedUser.displayName}</p>
                   <p className="text-sm text-gray-500">{selectedUser.email}</p>
