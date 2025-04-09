@@ -17,7 +17,7 @@ import { fetchUsers } from "../redux/features/tasks/usersSlice";
 import { db } from "../utils/firebase.config";
 
 const Chat = () => {
-  const { currentUser } = useSelector((state) => state.users);
+  const { uid, displayName, photoURL } = useSelector((state) => state.users);
   const { users, isLoading, isError, error } = useSelector(
     (state) => state.allUsers
   );
@@ -30,14 +30,14 @@ const Chat = () => {
 
   // Update current user's online status
   useEffect(() => {
-    if (!currentUser?.uid) return;
+    if (!uid) return;
 
-    const userStatusRef = doc(db, "status", currentUser.uid);
+    const userStatusRef = doc(db, "status", uid);
     const unsubscribe = onSnapshot(userStatusRef, (doc) => {
       if (doc.exists()) {
         setOnlineUsers((prev) => ({
           ...prev,
-          [currentUser.uid]: doc.data().state === "online",
+          [uid]: doc.data().state === "online",
         }));
       }
     });
@@ -67,11 +67,11 @@ const Chat = () => {
         lastChanged: serverTimestamp(),
       });
     };
-  }, [currentUser?.uid]);
+  }, [uid]);
 
   // Listen to other users' online status
   useEffect(() => {
-    if (!currentUser?.uid) return;
+    if (!uid) return;
 
     const statusRef = collection(db, "status");
     const q = query(statusRef, where("state", "==", "online"));
@@ -85,14 +85,14 @@ const Chat = () => {
     });
 
     return () => unsubscribe();
-  }, [currentUser?.uid]);
+  }, [uid]);
 
   // Fetch all users using Redux
   useEffect(() => {
-    if (currentUser?.uid) {
+    if (uid) {
       dispatch(fetchUsers());
     }
-  }, [currentUser?.uid, dispatch]);
+  }, [uid, dispatch]);
 
   // Show error toast if there's an error fetching users
   useEffect(() => {
@@ -108,7 +108,7 @@ const Chat = () => {
     const messagesRef = collection(db, "messages");
     const q = query(
       messagesRef,
-      where("participants", "array-contains", currentUser?.uid),
+      where("participants", "array-contains", uid),
       orderBy("timestamp", "asc")
     );
 
@@ -120,16 +120,14 @@ const Chat = () => {
         }))
         .filter(
           (msg) =>
-            (msg.senderId === currentUser?.uid &&
-              msg.receiverId === selectedUser.uid) ||
-            (msg.senderId === selectedUser.uid &&
-              msg.receiverId === currentUser?.uid)
+            (msg.senderId === uid && msg.receiverId === selectedUser.uid) ||
+            (msg.senderId === selectedUser.uid && msg.receiverId === uid)
         );
       setMessages(newMessages);
     });
 
     return () => unsubscribe();
-  }, [selectedUser, currentUser?.uid]);
+  }, [selectedUser, uid]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -144,12 +142,12 @@ const Chat = () => {
       const messagesRef = collection(db, "messages");
       await addDoc(messagesRef, {
         text: newMessage,
-        senderId: currentUser?.uid,
+        senderId: uid,
         receiverId: selectedUser.uid,
-        senderName: currentUser?.displayName,
+        senderName: displayName,
         receiverName: selectedUser.displayName,
         timestamp: serverTimestamp(),
-        participants: [currentUser?.uid, selectedUser.uid],
+        participants: [uid, selectedUser.uid],
       });
       setNewMessage("");
     } catch (error) {
@@ -164,36 +162,55 @@ const Chat = () => {
       <div className="w-1/4 border-r border-gray-200 p-4 overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">Users</h2>
         <div className="space-y-2">
-          {users.map((user) => (
-            <div
-              key={user.uid}
-              onClick={() => setSelectedUser(user)}
-              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 ${
-                selectedUser?.uid === user.uid ? "bg-primary/10" : ""
-              }`}
-            >
-              <div className="relative">
-                <img
-                  src={
-                    user.photoURL ||
-                    "https://ui-avatars.com/api/?name=User&background=random"
-                  }
-                  alt={user.displayName}
-                  className="w-10 h-10 rounded-full"
-                />
-                <span
-                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                    onlineUsers[user.uid] ? "bg-green-500" : "bg-gray-400"
-                  }`}
-                  title={onlineUsers[user.uid] ? "Online" : "Offline"}
-                />
-              </div>
-              <div>
-                <p className="font-medium">{user.displayName}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
+          {isLoading ? (
+            <div className="animate-pulse space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-100"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-200" />
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2 mt-2" />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : users.length > 0 ? (
+            users.map((user) => (
+              <div
+                key={user.uid}
+                onClick={() => setSelectedUser(user)}
+                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                  selectedUser?.uid === user.uid ? "bg-primary/10" : ""
+                }`}
+              >
+                <div className="relative">
+                  <img
+                    src={
+                      user.photoURL ||
+                      "https://ui-avatars.com/api/?name=User&background=random"
+                    }
+                    alt={user.displayName}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <span
+                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                      onlineUsers[user.uid] ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                    title={onlineUsers[user.uid] ? "Online" : "Offline"}
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{user.displayName}</p>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 text-center">No users found</p>
+          )}
         </div>
       </div>
 
@@ -235,14 +252,12 @@ const Chat = () => {
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.senderId === currentUser?.uid
-                      ? "justify-end"
-                      : "justify-start"
+                    message.senderId === uid ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
                     className={`max-w-[70%] rounded-lg p-3 ${
-                      message.senderId === currentUser?.uid
+                      message.senderId === uid
                         ? "bg-primary text-white"
                         : "bg-gray-100"
                     }`}

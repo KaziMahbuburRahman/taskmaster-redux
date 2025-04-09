@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../utils/firebase.config";
 
 const initialState = {
@@ -11,24 +11,32 @@ const initialState = {
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
       console.log("Starting to fetch users from Firestore...");
-      const usersRef = collection(db, "users");
-      console.log("Firestore collection reference created");
+      const state = getState();
+      const currentUserId = state.users.uid;
 
-      const querySnapshot = await getDocs(usersRef);
+      if (!currentUserId) {
+        throw new Error("No current user found");
+      }
+
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("uid", "!=", currentUserId));
+      console.log("Firestore query created with currentUserId:", currentUserId);
+
+      const querySnapshot = await getDocs(q);
       console.log("Query snapshot received:", querySnapshot.size, "documents");
 
-      const users = [];
+      const usersList = [];
       querySnapshot.forEach((doc) => {
         const userData = { id: doc.id, ...doc.data() };
         console.log("Processing user:", userData);
-        users.push(userData);
+        usersList.push(userData);
       });
 
-      console.log("Successfully fetched users:", users);
-      return users;
+      console.log("Successfully fetched users:", usersList);
+      return usersList;
     } catch (error) {
       console.error("Error fetching users:", error);
       return rejectWithValue(error.message);
