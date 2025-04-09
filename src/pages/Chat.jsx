@@ -17,7 +17,7 @@ import { fetchUsers } from "../redux/features/tasks/usersSlice";
 import { db } from "../utils/firebase.config";
 
 const Chat = () => {
-  const { uid, displayName, photoURL } = useSelector((state) => state.users);
+  const { uid, name } = useSelector((state) => state.users);
   const { users, isLoading, isError, error } = useSelector(
     (state) => state.allUsers
   );
@@ -138,21 +138,50 @@ const Chat = () => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedUser) return;
 
+    // Validate required user data
+    if (!uid || !name) {
+      console.error("Missing user data:", { uid, name });
+      toast.error("Unable to send message: User information is incomplete");
+      return;
+    }
+
+    if (!selectedUser.uid || !selectedUser.displayName) {
+      console.error("Missing recipient data:", selectedUser);
+      toast.error(
+        "Unable to send message: Recipient information is incomplete"
+      );
+      return;
+    }
+
     try {
+      console.log("Attempting to send message...");
+      console.log("Current user:", { uid, name });
+      console.log("Selected user:", selectedUser);
+
       const messagesRef = collection(db, "messages");
-      await addDoc(messagesRef, {
+      const messageData = {
         text: newMessage,
         senderId: uid,
         receiverId: selectedUser.uid,
-        senderName: displayName,
+        senderName: name,
         receiverName: selectedUser.displayName,
         timestamp: serverTimestamp(),
         participants: [uid, selectedUser.uid],
-      });
+      };
+
+      console.log("Message data:", messageData);
+
+      const docRef = await addDoc(messagesRef, messageData);
+      console.log("Message sent successfully with ID:", docRef.id);
+
       setNewMessage("");
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error("Failed to send message");
+      console.error("Detailed error sending message:", {
+        error: error.message,
+        code: error.code,
+        stack: error.stack,
+      });
+      toast.error(`Failed to send message: ${error.message}`);
     }
   };
 
